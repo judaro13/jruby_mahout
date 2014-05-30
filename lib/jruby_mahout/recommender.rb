@@ -2,7 +2,7 @@ module JrubyMahout
   class Recommender
     attr_accessor :is_weighted, :neighborhood_size, :similarity_name, :recommender_name, :data_model
 
-    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted)
+    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features=0)
       @is_weighted = is_weighted
       @neighborhood_size = neighborhood_size
       @similarity_name = similarity_name
@@ -10,7 +10,8 @@ module JrubyMahout
       @recommender_builder = RecommenderBuilder.new(@similarity_name,
                                                    @neighborhood_size,
                                                    @recommender_name,
-                                                   @is_weighted)
+                                                   @is_weighted,
+                                                   features)
       @data_model = nil
       @recommender = nil
     end

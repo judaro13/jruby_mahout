@@ -6,26 +6,31 @@ module JrubyMahout
     java_import org.apache.mahout.cf.taste.impl.similarity.SpearmanCorrelationSimilarity
     java_import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity
     java_import org.apache.mahout.cf.taste.impl.similarity.TanimotoCoefficientSimilarity
-    java_import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
 
     java_import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
     java_import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood
 
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender
-    java_import org.apache.mahout.cf.taste.impl.recommender.slopeone.SlopeOneRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.ItemAverageRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.ItemUserAverageRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.RandomRecommender
+
+    java_import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer
 
     java_import org.apache.mahout.cf.taste.common.Weighting
 
     attr_accessor :recommender_name, :item_based_allowed
     # public interface RecommenderBuilder
     # Implementations of this inner interface are simple helper classes which create a Recommender to be evaluated based on the given DataModel.
-    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted)
-      @is_weighted = is_weighted
-      @neighborhood_size = neighborhood_size
-      @similarity_name = similarity_name
-      @recommender_name = recommender_name
+    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features=0)
+      @is_weighted        = is_weighted
+      @neighborhood_size  = neighborhood_size
+      @similarity_name    = similarity_name
+      @recommender_name   = recommender_name
       @item_based_allowed = (@similarity_name == "SpearmanCorrelationSimilarity") ? false : true
+      @features           = features
     end
 
     # buildRecommender(DataModel dataModel)
@@ -45,11 +50,13 @@ module JrubyMahout
             similarity = TanimotoCoefficientSimilarity.new(data_model)
           when "GenericItemSimilarity"
             similarity = PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED)
+          when "ALSWRFactorizer"
+            factorizer = ALSWRFactorizer.new(data_model, @features, 0.065, 15);
           else
             similarity = nil
         end
 
-        unless @neighborhood_size.nil?
+        if !@neighborhood_size.nil? && @features == 0
           if @neighborhood_size > 1
             neighborhood = NearestNUserNeighborhood.new(Integer(@neighborhood_size), similarity, data_model)
           elsif @neighborhood_size >= -1 and @neighborhood_size <= 1
@@ -64,6 +71,8 @@ module JrubyMahout
             recommender = (@item_based_allowed) ? GenericItemBasedRecommender.new(data_model, similarity) : nil
           when "SlopeOneRecommender"
             recommender = SlopeOneRecommender.new(data_model)
+          when "SVDRecommender"
+            recommender = SVDRecommender.new(data_model, factorizer)
           else
             recommender = nil
         end
