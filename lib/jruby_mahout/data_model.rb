@@ -9,10 +9,9 @@ module JrubyMahout
         when "file"
           @data_model = FileDataModel.new(java.io.File.new(params[:file_path]))
         when "mysql"
-          # TODO: implement
-          @data_model = nil
+          @data_model = Databases::MysqlManager.new(params).setup_data_model(params)
         when "postgres"
-          @data_model = PostgresManager.new(params).setup_data_model(params)
+          @data_model = Databases::PostgresManager.new(params).setup_data_model(params)
         else
           @data_model = nil
       end

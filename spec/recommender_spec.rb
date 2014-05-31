@@ -91,6 +91,19 @@ describe JrubyMahout::Recommender do
 
       recommender.data_model.should be_an_instance_of org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel
     end
+
+    it "should load mysql data model" do
+      recommender = JrubyMahout::Recommender.new("TanimotoCoefficientSimilarity", 5, "GenericUserBasedRecommender", false)
+      recommender.data_model = JrubyMahout::DataModel.new("mysql", {
+          :host => "localhost",
+          :db_name => "localhost",
+          :username => "root",
+          :password => "",
+          :table_name => "taste_preferences"
+      }).data_model
+
+      recommender.data_model.should be_an_instance_of org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel
+    end
   end
 
   describe "SVDRecommender" do
