@@ -12,9 +12,6 @@ module JrubyMahout
 
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender
-    java_import org.apache.mahout.cf.taste.impl.recommender.ItemAverageRecommender
-    java_import org.apache.mahout.cf.taste.impl.recommender.ItemUserAverageRecommender
-    java_import org.apache.mahout.cf.taste.impl.recommender.RandomRecommender
 
     java_import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender
     java_import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer
