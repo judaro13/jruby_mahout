@@ -8,10 +8,8 @@ module JrubyMahout
       end
 
       def create_statement
-        with_exception do
-          connection = @data_source.getConnection
-          @statement = connection.createStatement
-        end
+        connection = @data_source.getConnection
+        @statement = connection.createStatement
       end
 
       def close_data_source
@@ -35,6 +33,7 @@ module JrubyMahout
 
       def create_table(table_name)
         with_exception do
+          @statement.executeUpdate("DROP TABLE IF EXISTS #{table_name};")
           @statement.executeUpdate("
             CREATE TABLE #{table_name} (
               user_id BIGINT NOT NULL,
@@ -51,8 +50,8 @@ module JrubyMahout
 
       def delete_table(table_name)
         with_exception do
-          @statement.executeUpdate("DROP INDEX IF EXISTS #{table_name}_user_id_index;")
-          @statement.executeUpdate("DROP INDEX IF EXISTS #{table_name}_item_id_index;")
+          @statement.executeUpdate("DROP INDEX #{table_name}_user_id_index ON #{table_name};")
+          @statement.executeUpdate("DROP INDEX #{table_name}_item_id_index ON #{table_name};")
           @statement.executeUpdate("DROP TABLE IF EXISTS #{table_name};")
         end
       end
@@ -63,7 +62,7 @@ module JrubyMahout
         begin
           yield
         rescue Exception => e
-          puts "#{$!}\n #{$@}"
+          puts "#{$!}\n #{$@.join("\n")}"
         end
       end
     end

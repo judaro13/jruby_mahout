@@ -6,7 +6,7 @@ module JrubyMahout
       begin
         java_import com.mysql.jdbc.jdbc2.optional.MysqlDataSource
       rescue Exception => e
-        puts "#{$!}\n #{$@}"
+        puts "#{$!}\n #{$@.join("\n")}"
       end
 
       def initialize(params)
