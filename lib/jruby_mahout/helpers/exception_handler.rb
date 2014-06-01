@@ -8,7 +8,7 @@ module JrubyMahout
 
       def with_exception(&block)
         begin
-          yield
+          return yield
         rescue Exception => e
           puts "#{$!}\n #{$@.join("\n")}"
         end

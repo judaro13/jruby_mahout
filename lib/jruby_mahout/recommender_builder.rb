@@ -1,5 +1,7 @@
 module JrubyMahout
   class RecommenderBuilder
+    include JrubyMahout::Helpers::ExceptionHandler
+
     java_import org.apache.mahout.cf.taste.eval.RecommenderBuilder
     java_import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
     java_import org.apache.mahout.cf.taste.impl.similarity.EuclideanDistanceSimilarity
@@ -21,7 +23,7 @@ module JrubyMahout
     attr_accessor :recommender_name, :item_based_allowed
     # public interface RecommenderBuilder
     # Implementations of this inner interface are simple helper classes which create a Recommender to be evaluated based on the given DataModel.
-    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features=0)
+    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features)
       @is_weighted        = is_weighted
       @neighborhood_size  = neighborhood_size
       @similarity_name    = similarity_name
@@ -30,15 +32,13 @@ module JrubyMahout
       @features           = features
     end
 
-    # buildRecommender(DataModel dataModel)
+    # build_recommender(DataModel dataModel)
     # Builds a Recommender implementation to be evaluated, using the given DataModel.
     def build_recommender(data_model)
-      begin
+      with_exception do
         similarity   = build_similarity(data_model)
         neighborhood = build_neighborhood(data_model, similarity)
         create_recommender(data_model, neighborhood, similarity)
-      rescue Exception => e
-        puts "#{$!}\n #{$@.join("\n")}"
       end
     end
 
@@ -79,8 +79,6 @@ module JrubyMahout
           GenericUserBasedRecommender.new(data_model, neighborhood, similarity)
         when "GenericItemBasedRecommender"
           @item_based_allowed ? GenericItemBasedRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
-        when "SlopeOneRecommender"
-          SlopeOneRecommender.new(data_model)
         when "SVDRecommender"
           SVDRecommender.new(data_model, similarity)
         else

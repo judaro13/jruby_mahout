@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe JrubyMahout::Databases::PostgresManager do
-  let(:recommender) { JrubyMahout::Recommender.new("TanimotoCoefficientSimilarity", 5, "GenericUserBasedRecommender", false) }
+  let(:recommender) { JrubyMahout::Recommender.new({:similarity => "TanimotoCoefficientSimilarity", :neighborhood_size => 5, :recommender => "GenericUserBasedRecommender"}) }
   # CREATE DATABASE "jruby_mahout_test"  WITH OWNER "postgres" ENCODING 'UTF8';
   let(:postgres_params) {{
         :host => "localhost",

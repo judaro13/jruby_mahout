@@ -4,19 +4,20 @@ module JrubyMahout
 
     attr_accessor :is_weighted, :neighborhood_size, :similarity_name, :recommender_name, :data_model, :recommender, :redis_cache
 
-    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features=0)
-      @is_weighted = is_weighted
-      @neighborhood_size = neighborhood_size
-      @similarity_name = similarity_name
-      @recommender_name = recommender_name
+    def initialize(params)
+      @is_weighted       = params[:is_weighted] || false
+      @neighborhood_size = params[:neighborhood_size]
+      @similarity_name   = params[:similarity]
+      @recommender_name  = params[:recommender]
+      num_of_features    = params[:num_of_features] || 0
       @recommender_builder = RecommenderBuilder.new(@similarity_name,
-                                                   @neighborhood_size,
-                                                   @recommender_name,
-                                                   @is_weighted,
-                                                   features)
-      @data_model = nil
+                                                    @neighborhood_size,
+                                                    @recommender_name,
+                                                    @is_weighted,
+                                                    num_of_features)
+      @data_model  = nil
       @recommender = nil
-      @redis_cache = RedisCache.new(nil, false, nil)
+      @redis_cache = params[:redis] ? RedisCache.new(params[:redis][:url], params[:redis][:prefix]) : nil
     end
 
     def data_model=(data_model)
@@ -26,7 +27,7 @@ module JrubyMahout
 
     def recommend(user_id, number_of_items, rescorer)
       with_exception do
-        cached_recommendations = (@redis_cache.on?) ? @redis_cache.redis.get(recommendations_key(user_id, number_of_items)) : nil
+        cached_recommendations = @redis_cache ? @redis_cache.redis.get(recommendations_key(user_id, number_of_items)) : nil
 
         if cached_recommendations
           JSON.parse(cached_recommendations)
@@ -38,7 +39,7 @@ module JrubyMahout
             recommendations_array << [recommendation.getItemID, recommendation.getValue.round(5)]
           end
 
-          @redis_cache.redis.set(recommendations_key(user_id, number_of_items), recommendations_array.to_json) unless @redis_cache.off?
+          @redis_cache.redis.set(recommendations_key(user_id, number_of_items), recommendations_array.to_json) if @redis_cache
 
           recommendations_array
         end
@@ -54,7 +55,7 @@ module JrubyMahout
 
     def similar_items(item_id, number_of_items, rescorer)
       with_exception do
-        cached_similar_items = (@redis_cache.on?) ? @redis_cache.redis.get(similar_items_key(item_id, number_of_items)) : nil
+        cached_similar_items = @redis_cache ? @redis_cache.redis.get(similar_items_key(item_id, number_of_items)) : nil
 
         if cached_similar_items
           JSON.parse(cached_similar_items)
@@ -66,7 +67,7 @@ module JrubyMahout
             similarities_array << similarity.getItemID
           end
 
-          @redis_cache.redis.set(similar_items_key(item_id, number_of_items), similarities_array.to_json) unless @redis_cache.off?
+          @redis_cache.redis.set(similar_items_key(item_id, number_of_items), similarities_array.to_json) if @redis_cache
 
           similarities_array
         end
@@ -76,14 +77,14 @@ module JrubyMahout
 
     def similar_users(user_id, number_of_users, rescorer)
       with_exception do
-        cached_similar_users = (@redis_cache.on?) ? @redis_cache.redis.get(similar_users_key(user_id, number_of_users)) : nil
+        cached_similar_users = @redis_cache ? @redis_cache.redis.get(similar_users_key(user_id, number_of_users)) : nil
 
         if cached_similar_users
           JSON.parse(cached_similar_users)
         else
           similar_users = to_array(@recommender.mostSimilarUserIDs(user_id, number_of_users, rescorer))
 
-          @redis_cache.redis.set(similar_users_key(user_id, number_of_users), similar_users.to_json) unless @redis_cache.off?
+          @redis_cache.redis.set(similar_users_key(user_id, number_of_users), similar_users.to_json) if @redis_cache
 
           similar_users
         end
@@ -93,14 +94,14 @@ module JrubyMahout
 
     def estimate_preference(user_id, item_id)
       with_exception do
-        cached_estimate_preference = (@redis_cache.on?) ? @redis_cache.redis.get(estimate_preference_key(user_id, item_id, number_of_items)) : nil
+        cached_estimate_preference = @redis_cache ? @redis_cache.redis.get(estimate_preference_key(user_id, item_id, number_of_items)) : nil
 
         if cached_estimate_preference
           JSON.parse(cached_estimate_preference)
         else
           estimate_preference = @recommender.estimatePreference(user_id, item_id)
 
-          @redis_cache.redis.set(estimate_preference_key(user_id, item_id, number_of_items), estimate_preference.to_json) unless @redis_cache.off?
+          @redis_cache.redis.set(estimate_preference_key(user_id, item_id, number_of_items), estimate_preference.to_json) if @redis_cache
 
           estimate_preference
         end
@@ -110,14 +111,14 @@ module JrubyMahout
 
     def recommended_because(user_id, item_id, number_of_items)
       with_exception do
-        cached_recommended_because = (@redis_cache.on?) ? @redis_cache.redis.get(recommended_because_key(user_id, item_id, number_of_items)) : nil
+        cached_recommended_because = @redis_cache ? @redis_cache.redis.get(recommended_because_key(user_id, item_id, number_of_items)) : nil
 
         if cached_recommended_because
           JSON.parse(cached_recommended_because)
         else
           recommended_because = to_array(@recommender.recommendedBecause(user_id, item_id, number_of_items))
 
-          @redis_cache.redis.set(recommended_because_key(user_id, item_id, number_of_items), recommended_because.to_json) unless @redis_cache.off?
+          @redis_cache.redis.set(recommended_because_key(user_id, item_id, number_of_items), recommended_because.to_json) if @redis_cache
 
           recommended_because
         end

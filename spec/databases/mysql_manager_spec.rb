@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe JrubyMahout::Databases::MysqlManager do
-  let(:recommender) {JrubyMahout::Recommender.new("TanimotoCoefficientSimilarity", 5, "GenericUserBasedRecommender", false)}
+  let(:recommender) {JrubyMahout::Recommender.new({:similarity => "TanimotoCoefficientSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5})}
   let(:mysql_params) {{
     :host => "localhost",
     :db_name => "jruby_mahout_test",
