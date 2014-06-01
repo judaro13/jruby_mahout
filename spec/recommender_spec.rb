@@ -141,14 +141,6 @@ describe JrubyMahout::Recommender do
           recommender.recommend(1, 10, nil).should be_an_instance_of Array
         end
   
-        it "should return an array for GenericItemSimilarity and GenericUserBasedRecommender" do
-          params      = {:similarity => "GenericItemSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
-          recommender = JrubyMahout::Recommender.new(params)
-          recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-  
-          recommender.recommend(1, 10, nil).should be_an_instance_of Array
-        end
-  
         it "should return an array for PearsonCorrelationSimilarity and GenericItemBasedRecommender" do
           params      = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericItemBasedRecommender"}
           recommender = JrubyMahout::Recommender.new(params)
@@ -181,13 +173,6 @@ describe JrubyMahout::Recommender do
           recommender.recommend(1, 10, nil).should be_an_instance_of Array
         end
   
-        it "should return an array for GenericItemSimilarity and GenericItemBasedRecommender" do
-          params      = {:similarity => "GenericItemSimilarity", :recommender => "GenericItemBasedRecommender"}
-          recommender = JrubyMahout::Recommender.new(params)
-          recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-  
-          recommender.recommend(1, 10, nil).should be_an_instance_of Array
-        end
       end
 
       context "with ThresholdUserNeighborhood" do
@@ -231,14 +216,6 @@ describe JrubyMahout::Recommender do
           recommender.recommend(1, 10, nil).should be_an_instance_of Array
         end
 
-        it "should return an array for GenericItemSimilarity and GenericUserBasedRecommender" do
-          params      = {:similarity => "GenericItemSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 0.7}
-          recommender = JrubyMahout::Recommender.new(params)
-          recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-
-          recommender.recommend(1, 10, nil).should be_an_instance_of Array
-        end
-
         it "should return an array for PearsonCorrelationSimilarity and GenericItemBasedRecommender" do
           params      = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericItemBasedRecommender"}
           recommender = JrubyMahout::Recommender.new(params)
@@ -271,13 +248,6 @@ describe JrubyMahout::Recommender do
           recommender.recommend(1, 10, nil).should be_an_instance_of Array
         end
 
-        it "should return an array for GenericItemSimilarity and GenericItemBasedRecommender" do
-          params      = {:similarity => "GenericItemSimilarity", :recommender => "GenericItemBasedRecommender"}
-          recommender = JrubyMahout::Recommender.new(params)
-          recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-
-          recommender.recommend(1, 10, nil).should be_an_instance_of Array
-        end
       end
     end
 
@@ -342,14 +312,6 @@ describe JrubyMahout::Recommender do
         recommender.evaluate(0.7, 0.3).should be_an_instance_of Float
       end
 
-      it "should return a float for GenericItemSimilarity and GenericUserBasedRecommender" do
-        params = {:similarity => "GenericItemSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
-        recommender = JrubyMahout::Recommender.new(params)
-        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-
-        recommender.evaluate(0.7, 0.3).should be_an_instance_of Float
-      end
-
       it "should return a float for PearsonCorrelationSimilarity and GenericItemBasedRecommender" do
         params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericItemBasedRecommender"}
         recommender = JrubyMahout::Recommender.new(params)
@@ -382,13 +344,6 @@ describe JrubyMahout::Recommender do
         recommender.evaluate(0.7, 0.3).should be_an_instance_of Float
       end
 
-      it "should return a float for GenericItemSimilarity and GenericItemBasedRecommender" do
-        params = {:similarity => "GenericItemSimilarity", :recommender => "GenericItemBasedRecommender"}
-        recommender = JrubyMahout::Recommender.new(params)
-        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
-
-        recommender.evaluate(0.7, 0.3).should be_an_instance_of Float
-      end
     end
 
     context "with invalid arguments" do
@@ -418,13 +373,38 @@ describe JrubyMahout::Recommender do
   # TODO: cover all cases
   describe ".similar_items" do
     context "with valid arguments" do
-      it "should return an array of items" do
-        params = {:similarity => "GenericItemSimilarity", :recommender => "GenericItemBasedRecommender"}
+      it "should return an array of items, PearsonCorrelationSimilarity and GenericItemBasedRecommender" do
+        params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericItemBasedRecommender"}
         recommender = JrubyMahout::Recommender.new(params)
         recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
 
         recommender.similar_items(4, 10, nil).should be_an_instance_of Array
       end
+
+      it "should return an array of items, EuclideanDistanceSimilarity and GenericItemBasedRecommender" do
+        params = {:similarity => "EuclideanDistanceSimilarity", :recommender => "GenericItemBasedRecommender"}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_items(4, 10, nil).should be_an_instance_of Array
+      end
+
+      it "should return an array of items, LogLikelihoodSimilarity and GenericItemBasedRecommender" do
+        params = {:similarity => "LogLikelihoodSimilarity", :recommender => "GenericItemBasedRecommender"}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_items(4, 10, nil).should be_an_instance_of Array
+      end
+
+      it "should return an array of items, TanimotoCoefficientSimilarity and GenericItemBasedRecommender" do
+        params = {:similarity => "TanimotoCoefficientSimilarity", :recommender => "GenericItemBasedRecommender"}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_items(4, 10, nil).should be_an_instance_of Array
+      end
+
     end
   end
 

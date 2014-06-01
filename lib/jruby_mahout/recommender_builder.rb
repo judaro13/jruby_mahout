@@ -54,8 +54,6 @@ module JrubyMahout
           LogLikelihoodSimilarity.new(data_model)
         when "TanimotoCoefficientSimilarity"
           TanimotoCoefficientSimilarity.new(data_model)
-        when "GenericItemSimilarity"
-          PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED)
         when "ALSWRFactorizer"
           ALSWRFactorizer.new(data_model, @features, 0.065, 15);
         else
