@@ -23,7 +23,7 @@ module JrubyMahout
     end
 
     def recommend(user_id, number_of_items, rescorer)
-      begin
+      with_exception do
         cached_recommendations = (@redis_cache.on?) ? @redis_cache.redis.get("#{@redis_cache.prefix}-recommendations-user_id:#{user_id}-number_of_items:#{number_of_items}")
                                                     : nil
 
@@ -41,24 +41,20 @@ module JrubyMahout
 
           recommendations_array
         end
-      rescue Exception => e
-        e
       end
     end
 
     def evaluate(training_percentage, evaluation_percentage)
-      begin
+      with_exception do
         evaluator = Evaluator.new(@data_model, @recommender_builder)
         evaluator.evaluate(training_percentage, evaluation_percentage)
-      rescue Exception => e
-        e
       end
     end
 
     def similar_items(item_id, number_of_items, rescorer)
-      begin
+      with_exception do
         cached_similar_items = (@redis_cache.on?) ? @redis_cache.redis.get("#{@redis_cache.prefix}-similar_items-item_id:#{item_id}-number_of_items:#{number_of_items}")
-        : nil
+                                                  : nil
 
         if cached_similar_items
           JSON.parse(cached_similar_items)
@@ -75,13 +71,11 @@ module JrubyMahout
           similarities_array
         end
 
-      rescue Exception => e
-        e
       end
     end
 
     def similar_users(user_id, number_of_users, rescorer)
-      begin
+      with_exception do
         cached_similar_users = (@redis_cache.on?) ? @redis_cache.redis.get("#{@redis_cache.prefix}-similar_users-user_id:#{user_id}-number_of_items:#{number_of_items}")
                                                   : nil
 
@@ -95,15 +89,13 @@ module JrubyMahout
           similar_users
         end
 
-      rescue Exception => e
-        e
       end
     end
 
     def estimate_preference(user_id, item_id)
-      begin
+      with_exception do
         cached_estimate_preference = (@redis_cache.on?) ? @redis_cache.redis.get("#{@redis_cache.prefix}-estimate_preference-user_id:#{user_id}-item_id:#{item_id}-number_of_items:#{number_of_items}")
-        : nil
+                                                        : nil
 
         if cached_estimate_preference
           JSON.parse(cached_estimate_preference)
@@ -115,15 +107,13 @@ module JrubyMahout
           estimate_preference
         end
 
-      rescue Exception => e
-        e
       end
     end
 
     def recommended_because(user_id, item_id, number_of_items)
-      begin
+      with_exception do
         cached_recommended_because = (@redis_cache.on?) ? @redis_cache.redis.get("#{@redis_cache.prefix}-recommended_because-user_id:#{user_id}-item_id:#{item_id}-number_of_items:#{number_of_items}")
-        : nil
+                                                        : nil
 
         if cached_recommended_because
           JSON.parse(cached_recommended_because)
@@ -134,14 +124,11 @@ module JrubyMahout
 
           recommended_because
         end
-
-
-      rescue Exception => e
-        e
       end
     end
 
     private
+
     def to_array(things)
       things_array = []
       things.each do |thing_id|
@@ -149,6 +136,14 @@ module JrubyMahout
       end
 
       things_array
+    end
+
+    def with_exception(&block)
+      begin
+        yield
+      rescue  Exception => e
+        puts "#{$!}\n #{$@.join("\n")}"
+      end
     end
   end
 end
