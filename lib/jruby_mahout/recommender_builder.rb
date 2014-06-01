@@ -29,6 +29,7 @@ module JrubyMahout
       @similarity_name    = params[:similarity]
       @recommender_name   = params[:recommender]
       @item_based_allowed = (@similarity_name == "SpearmanCorrelationSimilarity") ? false : true
+      @is_svd             = (@similarity_name == "ALSWRFactorizer") ? true : false
       @features           = params[:num_of_features] || 0
       @lambda             = params[:lambda] || 0.065
       @iterations         = params[:num_of_iterations] || 15
@@ -64,7 +65,7 @@ module JrubyMahout
     end
 
     def build_neighborhood(data_model, similarity)
-      if !@neighborhood_size.nil? && @features == 0
+      if !@neighborhood_size.nil? && !@is_svd
         if @neighborhood_size > 1
           neighborhood = NearestNUserNeighborhood.new(Integer(@neighborhood_size), similarity, data_model)
         elsif @neighborhood_size >= -1 and @neighborhood_size <= 1
@@ -80,7 +81,7 @@ module JrubyMahout
         when "GenericItemBasedRecommender"
           @item_based_allowed ? GenericItemBasedRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
         when "SVDRecommender"
-          SVDRecommender.new(data_model, similarity)
+          @is_svd ? SVDRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
         else
           nil
       end
