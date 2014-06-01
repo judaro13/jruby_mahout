@@ -34,16 +34,8 @@ module JrubyMahout
     # Builds a Recommender implementation to be evaluated, using the given DataModel.
     def build_recommender(data_model)
       begin
-        similarity = build_similarity
-
-        if !@neighborhood_size.nil? && @features == 0
-          if @neighborhood_size > 1
-            neighborhood = NearestNUserNeighborhood.new(Integer(@neighborhood_size), similarity, data_model)
-          elsif @neighborhood_size >= -1 and @neighborhood_size <= 1
-            neighborhood = ThresholdUserNeighborhood.new(Float(@neighborhood_size), similarity, data_model)
-          end
-        end
-
+        similarity   = build_similarity
+        neighborhood = build_neighborhood(data_model, similarity)
         create_recommender(data_model, neighborhood, similarity)
       rescue Exception => e
         puts "#{$!}\n #{$@.join("\n")}"
@@ -68,6 +60,16 @@ module JrubyMahout
           ALSWRFactorizer.new(data_model, @features, 0.065, 15);
         else
           nil
+      end
+    end
+
+    def build_neighborhood(data_model, similarity)
+      if !@neighborhood_size.nil? && @features == 0
+        if @neighborhood_size > 1
+          neighborhood = NearestNUserNeighborhood.new(Integer(@neighborhood_size), similarity, data_model)
+        elsif @neighborhood_size >= -1 and @neighborhood_size <= 1
+          neighborhood = ThresholdUserNeighborhood.new(Float(@neighborhood_size), similarity, data_model)
+        end
       end
     end
 
