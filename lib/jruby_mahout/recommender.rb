@@ -2,19 +2,10 @@ module JrubyMahout
   class Recommender
     include JrubyMahout::Helpers::ExceptionHandler
 
-    attr_accessor :is_weighted, :neighborhood_size, :similarity_name, :recommender_name, :data_model, :recommender, :redis_cache
+    attr_accessor :data_model, :recommender, :redis_cache
 
     def initialize(params)
-      @is_weighted       = params[:is_weighted] || false
-      @neighborhood_size = params[:neighborhood_size]
-      @similarity_name   = params[:similarity]
-      @recommender_name  = params[:recommender]
-      num_of_features    = params[:num_of_features] || 0
-      @recommender_builder = RecommenderBuilder.new(@similarity_name,
-                                                    @neighborhood_size,
-                                                    @recommender_name,
-                                                    @is_weighted,
-                                                    num_of_features)
+      @recommender_builder = RecommenderBuilder.new(params)
       @data_model  = nil
       @recommender = nil
       @redis_cache = params[:redis] ? RedisCache.new(params[:redis][:url], params[:redis][:prefix]) : nil

@@ -23,13 +23,13 @@ module JrubyMahout
     attr_accessor :recommender_name, :item_based_allowed
     # public interface RecommenderBuilder
     # Implementations of this inner interface are simple helper classes which create a Recommender to be evaluated based on the given DataModel.
-    def initialize(similarity_name, neighborhood_size, recommender_name, is_weighted, features)
-      @is_weighted        = is_weighted
-      @neighborhood_size  = neighborhood_size
-      @similarity_name    = similarity_name
-      @recommender_name   = recommender_name
+    def initialize(params)
+      @is_weighted        = params[:is_weighted] || false
+      @neighborhood_size  = params[:neighborhood_size]
+      @similarity_name    = params[:similarity]
+      @recommender_name   = params[:recommender]
       @item_based_allowed = (@similarity_name == "SpearmanCorrelationSimilarity") ? false : true
-      @features           = features
+      @features           = params[:num_of_features] || 0
     end
 
     # build_recommender(DataModel dataModel)
