@@ -23,6 +23,12 @@ module JrubyMahout
           @data_model = MySQLJDBCDataModel.new(@data_source, params[:table_name], "user_id", "item_id", "rating", "created")
         end
       end
+
+      def upsert_record(table_name, record)
+        with_exception do
+          @statement.execute("INSERT INTO #{table_name} (user_id, item_id, rating) VALUES (#{record[:user_id]}, #{record[:item_id]}, #{record[:rating]}) ON DUPLICATE KEY UPDATE rating = #{record[:rating]}")
+        end
+      end
     end
   end
 end

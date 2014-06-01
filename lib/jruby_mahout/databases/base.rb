@@ -19,16 +19,19 @@ module JrubyMahout
       end
 
       def upsert_record(table_name, record)
-        with_exception do
-          @statement.execute("UPDATE #{table_name} SET user_id=#{record[:user_id]}, item_id=#{record[:item_id]}, rating=#{record[:rating]} WHERE user_id=#{record[:user_id]} AND item_id=#{record[:item_id]};")
-          @statement.execute("INSERT INTO #{table_name} (user_id, item_id, rating) SELECT #{record[:user_id]}, #{record[:item_id]}, #{record[:rating]} WHERE NOT EXISTS (SELECT 1 FROM #{table_name} WHERE user_id=#{record[:user_id]} AND item_id=#{record[:item_id]});")
-        end
+        raise NotImplementedError.new("Implement upsert_record in child class")
       end
 
       def delete_record(table_name, record)
         with_exception do
           @statement.execute("DELETE FROM #{table_name} WHERE user_id=#{record[:user_id]} AND item_id=#{record[:item_id]};")
         end
+      end
+
+      def count_records(table_name)
+        result_set = @statement.executeQuery("SELECT COUNT(*) AS total FROM #{table_name}") # java.sql.resultset
+        result_set.next # move the cursor
+        result_set.getInt('total')
       end
 
       def create_table(table_name)

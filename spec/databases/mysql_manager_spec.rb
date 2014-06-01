@@ -30,4 +30,36 @@ describe JrubyMahout::Databases::MysqlManager do
       expect{ manager.delete_table('test_table') }.to_not raise_error
     end
   end
+
+  describe "add/delete records" do
+    before do
+      manager.create_statement
+      manager.create_table('test_table')
+    end
+    after do
+      manager.delete_table('test_table')
+    end
+
+    it "can add records" do
+      manager.upsert_record('test_table', {:user_id => 1, :item_id => 1, :rating => 1})
+      manager.count_records('test_table').should == 1
+    end
+
+    it "can add and update the records" do
+      manager.upsert_record('test_table', {:user_id => 1, :item_id => 1, :rating => 1})
+      manager.upsert_record('test_table', {:user_id => 1, :item_id => 1, :rating => 2})
+      manager.count_records('test_table').should == 1
+    end
+
+    it "can add mutiple records" do
+      manager.upsert_record('test_table', {:user_id => 1, :item_id => 1, :rating => 1})
+      manager.upsert_record('test_table', {:user_id => 2, :item_id => 1, :rating => 2})
+      manager.count_records('test_table').should == 2
+    end
+
+    it "can delete records" do
+      
+    end
+
+  end
 end
