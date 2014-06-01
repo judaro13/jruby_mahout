@@ -34,24 +34,7 @@ module JrubyMahout
     # Builds a Recommender implementation to be evaluated, using the given DataModel.
     def build_recommender(data_model)
       begin
-        case @similarity_name
-          when "PearsonCorrelationSimilarity"
-            similarity = (@is_weighted) ? PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED) : PearsonCorrelationSimilarity.new(data_model)
-          when "EuclideanDistanceSimilarity"
-            similarity = (@is_weighted) ? EuclideanDistanceSimilarity.new(data_model, Weighting::WEIGHTED) : EuclideanDistanceSimilarity.new(data_model)
-          when "SpearmanCorrelationSimilarity"
-            similarity = SpearmanCorrelationSimilarity.new(data_model)
-          when "LogLikelihoodSimilarity"
-            similarity = LogLikelihoodSimilarity.new(data_model)
-          when "TanimotoCoefficientSimilarity"
-            similarity = TanimotoCoefficientSimilarity.new(data_model)
-          when "GenericItemSimilarity"
-            similarity = PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED)
-          when "ALSWRFactorizer"
-            factorizer = ALSWRFactorizer.new(data_model, @features, 0.065, 15);
-          else
-            similarity = nil
-        end
+        similarity = build_similarity
 
         if !@neighborhood_size.nil? && @features == 0
           if @neighborhood_size > 1
@@ -61,22 +44,45 @@ module JrubyMahout
           end
         end
 
-        case @recommender_name
-          when "GenericUserBasedRecommender"
-            recommender = GenericUserBasedRecommender.new(data_model, neighborhood, similarity)
-          when "GenericItemBasedRecommender"
-            recommender = (@item_based_allowed) ? GenericItemBasedRecommender.new(data_model, similarity) : nil
-          when "SlopeOneRecommender"
-            recommender = SlopeOneRecommender.new(data_model)
-          when "SVDRecommender"
-            recommender = SVDRecommender.new(data_model, factorizer)
-          else
-            recommender = nil
-        end
-
-        recommender
+        create_recommender(data_model, neighborhood, similarity)
       rescue Exception => e
-        return e
+        puts "#{$!}\n #{$@.join("\n")}"
+      end
+    end
+
+    def build_similarity
+      case @similarity_name
+        when "PearsonCorrelationSimilarity"
+          @is_weighted ? PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED) : PearsonCorrelationSimilarity.new(data_model)
+        when "EuclideanDistanceSimilarity"
+          @is_weighted ? EuclideanDistanceSimilarity.new(data_model, Weighting::WEIGHTED) : EuclideanDistanceSimilarity.new(data_model)
+        when "SpearmanCorrelationSimilarity"
+          SpearmanCorrelationSimilarity.new(data_model)
+        when "LogLikelihoodSimilarity"
+          LogLikelihoodSimilarity.new(data_model)
+        when "TanimotoCoefficientSimilarity"
+          TanimotoCoefficientSimilarity.new(data_model)
+        when "GenericItemSimilarity"
+          PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED)
+        when "ALSWRFactorizer"
+          ALSWRFactorizer.new(data_model, @features, 0.065, 15);
+        else
+          nil
+      end
+    end
+
+    def create_recommender(data_model, neighborhood=nil, similarity=nil)
+      case @recommender_name
+        when "GenericUserBasedRecommender"
+          GenericUserBasedRecommender.new(data_model, neighborhood, similarity)
+        when "GenericItemBasedRecommender"
+          (@item_based_allowed) ? GenericItemBasedRecommender.new(data_model, similarity) : nil
+        when "SlopeOneRecommender"
+          SlopeOneRecommender.new(data_model)
+        when "SVDRecommender"
+          SVDRecommender.new(data_model, similarity)
+        else
+          nil
       end
     end
   end
