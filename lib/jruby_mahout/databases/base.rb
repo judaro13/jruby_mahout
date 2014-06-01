@@ -5,12 +5,16 @@ module JrubyMahout
 
       attr_accessor :data_model, :data_source, :statement
 
-      def post_init
+      def post_init(params)
         @data_source.setUser params[:username]
         @data_source.setPassword params[:password]
         @data_source.setServerName params[:host]
         @data_source.setPortNumber params[:port]
         @data_source.setDatabaseName params[:db_name]
+        if params[:table_name]
+          create_statement
+          create_table(params[:table_name])
+        end
       end
 
       def setup_data_model(params)
@@ -62,11 +66,7 @@ module JrubyMahout
       end
 
       def delete_table(table_name)
-        with_exception do
-          @statement.executeUpdate("DROP INDEX #{table_name}_user_id_index ON #{table_name};")
-          @statement.executeUpdate("DROP INDEX #{table_name}_item_id_index ON #{table_name};")
-          @statement.executeUpdate("DROP TABLE IF EXISTS #{table_name};")
-        end
+        raise NotImplementedError.new("Implement delete_table in child class")
       end
 
     end
