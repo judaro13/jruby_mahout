@@ -9,7 +9,7 @@ The goal of this library is to make machine learning at scale in JRuby projects 
 This is an early version of a JRuby gem that only supports Mahout recommendations. It also includes a simple Postgres manager that can be used to manage appropriate recommendations tables. Unfortunately it's impossible to use ActiveRecord (AR) with Mahout, because AR operates at a much higher level and creates a lot of overhead that is critical when dealing with millions of records in real time.
 
 ## Get Mahout
-First of all you need to download the Mahout library from one of the [mirrors](http://www.apache.org/dyn/closer.cgi/mahout/). Jruby Mahout only supports Mahout 0.7 at this point.
+First of all you need to download the Mahout library from one of the [mirrors](http://www.apache.org/dyn/closer.cgi/mahout/). Jruby Mahout only supports Mahout 0.9 at this point.
 
 ## Get Postgres JDBC Adapter
 If you wish to work with a database for recommendations, you'll have to install the [JDBC driver for Postgres](http://jdbc.postgresql.org/download.html). Another option is to use file-based recommendations.
@@ -25,7 +25,9 @@ end
 ### 3. Run `bundle install`.
 
 ## Brief Introduction
-I am planning to add more examples covering Jruby Mahout use cases to [this repo](https://github.com/vasinov/jruby_mahout-examples) soon.
+This repo is [vasinov](https://github.com/vasinov/jruby_mahout) and because vasinov is not going to suport the project, then I try to matian this project during my free time.
+
+I am planning to add more examples covering Jruby Mahout use cases soon.
 
 First, define the `MAHOUT_DIR` environmental variable for your Mahout installation. For example:
 
@@ -57,7 +59,7 @@ puts recommender.evaluate(0.7, 0.3)
 The closer the score is to zero—the better.
 
 ## Advanced
-I am working on a series of articles on how to utilize JRuby Mahout in the real world projects. This is the first one in the series:
+vasinov has an article on how to utilize JRuby Mahout in the real world projects. This is the first one in the series:
 - [Machine Learning with Ruby, Part One](http://www.vasinov.com/blog/machine-learning-with-ruby-part-one)
 
 ## Development Plans
