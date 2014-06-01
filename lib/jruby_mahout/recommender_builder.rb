@@ -30,6 +30,8 @@ module JrubyMahout
       @recommender_name   = params[:recommender]
       @item_based_allowed = (@similarity_name == "SpearmanCorrelationSimilarity") ? false : true
       @features           = params[:num_of_features] || 0
+      @lambda             = params[:lambda] || 0.065
+      @iterations         = params[:num_of_iterations] || 15
     end
 
     # build_recommender(DataModel dataModel)
@@ -55,7 +57,7 @@ module JrubyMahout
         when "TanimotoCoefficientSimilarity"
           TanimotoCoefficientSimilarity.new(data_model)
         when "ALSWRFactorizer"
-          ALSWRFactorizer.new(data_model, @features, 0.065, 15);
+          ALSWRFactorizer.new(data_model, @features, @lambda, @iterations);
         else
           nil
       end
