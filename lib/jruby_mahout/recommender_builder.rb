@@ -34,7 +34,7 @@ module JrubyMahout
     # Builds a Recommender implementation to be evaluated, using the given DataModel.
     def build_recommender(data_model)
       begin
-        similarity   = build_similarity
+        similarity   = build_similarity(data_model)
         neighborhood = build_neighborhood(data_model, similarity)
         create_recommender(data_model, neighborhood, similarity)
       rescue Exception => e
@@ -42,7 +42,7 @@ module JrubyMahout
       end
     end
 
-    def build_similarity
+    def build_similarity(data_model)
       case @similarity_name
         when "PearsonCorrelationSimilarity"
           @is_weighted ? PearsonCorrelationSimilarity.new(data_model, Weighting::WEIGHTED) : PearsonCorrelationSimilarity.new(data_model)
@@ -78,7 +78,7 @@ module JrubyMahout
         when "GenericUserBasedRecommender"
           GenericUserBasedRecommender.new(data_model, neighborhood, similarity)
         when "GenericItemBasedRecommender"
-          (@item_based_allowed) ? GenericItemBasedRecommender.new(data_model, similarity) : nil
+          @item_based_allowed ? GenericItemBasedRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
         when "SlopeOneRecommender"
           SlopeOneRecommender.new(data_model)
         when "SVDRecommender"

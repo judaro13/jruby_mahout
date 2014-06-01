@@ -254,7 +254,7 @@ describe JrubyMahout::Recommender do
         recommender = JrubyMahout::Recommender.new("SpearmanCorrelationSimilarity", nil, "GenericItemBasedRecommender", false)
         recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
 
-        recommender.recommend(1, 10, nil).should be nil
+        recommender.recommend(1, 10, nil).should == []
       end
     end
   end

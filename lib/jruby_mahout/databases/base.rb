@@ -1,7 +1,17 @@
 module JrubyMahout
   module Databases
     class Base
+      include JrubyMahout::Helpers::ExceptionHandler
+
       attr_accessor :data_model, :data_source, :statement
+
+      def post_init
+        @data_source.setUser params[:username]
+        @data_source.setPassword params[:password]
+        @data_source.setServerName params[:host]
+        @data_source.setPortNumber params[:port]
+        @data_source.setDatabaseName params[:db_name]
+      end
 
       def setup_data_model(params)
         raise NotImplementedError.new("Implement setup_data_model in child class")
@@ -59,15 +69,6 @@ module JrubyMahout
         end
       end
 
-      private
-
-      def with_exception(&block)
-        begin
-          yield
-        rescue Exception => e
-          puts "#{$!}\n #{$@.join("\n")}"
-        end
-      end
     end
   end
 end

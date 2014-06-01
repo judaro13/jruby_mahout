@@ -16,5 +16,7 @@ Gem::Specification.new do |gem|
   gem.executables = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
 
   gem.add_development_dependency "rake"
+  gem.add_development_dependency "codeclimate-test-reporter"
+  gem.add_development_dependency "ruby-debug"
   gem.add_development_dependency "rspec"
 end

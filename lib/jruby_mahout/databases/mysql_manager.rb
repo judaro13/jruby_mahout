@@ -11,15 +11,13 @@ module JrubyMahout
 
       def initialize(params)
         @data_source = MysqlDataSource.new
-        @data_source.setUser params[:username]
-        @data_source.setPassword params[:password]
-        @data_source.setServerName params[:host]
-        @data_source.setPortNumber params[:port]
-        @data_source.setDatabaseName params[:db_name]
+        post_init
       end
 
       def setup_data_model(params)
         with_exception do
+          create_statement
+          create_table(params[:table_name])
           @data_model = MySQLJDBCDataModel.new(@data_source, params[:table_name], "user_id", "item_id", "rating", "created")
         end
       end
