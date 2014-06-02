@@ -357,20 +357,43 @@ describe JrubyMahout::Recommender do
     end
   end
 
-  # TODO: cover all cases
   describe ".similar_users" do
     context "with valid arguments" do
-      it "should return an array of users" do
+      it "should return an array of users, SpearmanCorrelationSimilarity and GenericUserBasedRecommender" do
         params = {:similarity => "SpearmanCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
         recommender = JrubyMahout::Recommender.new(params)
         recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
 
         recommender.similar_users(1, 10, nil).should be_an_instance_of Array
       end
+
+      it "should return an array of users, PearsonCorrelationSimilarity and GenericUserBasedRecommender" do
+        params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_users(1, 10, nil).should be_an_instance_of Array
+      end
+
+      it "should return an array of users, LogLikelihoodSimilarity and GenericUserBasedRecommender" do
+        params = {:similarity => "LogLikelihoodSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_users(1, 10, nil).should be_an_instance_of Array
+      end
+
+      it "should return an array of users, TanimotoCoefficientSimilarity and GenericUserBasedRecommender" do
+        params = {:similarity => "TanimotoCoefficientSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
+        recommender = JrubyMahout::Recommender.new(params)
+        recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
+
+        recommender.similar_users(1, 10, nil).should be_an_instance_of Array
+      end
+
     end
   end
 
-  # TODO: cover all cases
   describe ".similar_items" do
     context "with valid arguments" do
       it "should return an array of items, PearsonCorrelationSimilarity and GenericItemBasedRecommender" do
@@ -430,6 +453,70 @@ describe JrubyMahout::Recommender do
         recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model
 
         recommender.estimate_preference(1, 138).should be_an_instance_of Float
+      end
+    end
+  end
+
+  describe "with RedisCache" do
+    let(:data_model) {JrubyMahout::DataModel.new("file", { :file_path => "spec/recommender_data.csv" }).data_model}
+
+    context "ItemBased" do
+      let(:params) {{:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericItemBasedRecommender", :redis => {:url => 'redis://localhost:6379'}}}
+      let(:recommender) {JrubyMahout::Recommender.new(params)}
+      before do
+        recommender.data_model = data_model
+        recommender.recommend(1, 10, nil)
+        recommender.similar_items(2, 10, nil)
+      end
+
+      it "should cache the recommendations" do
+        recommender.redis_cache.get(recommender.recommendations_key(1, 10)).should_not be_nil
+      end
+
+      it "should cache the similar_items" do
+        recommender.redis_cache.get(recommender.similar_items_key(2, 10)).should_not be_nil
+      end
+
+      it "should cache correct value for recommendations" do
+        cached = recommender.redis_cache.get(recommender.recommendations_key(1, 10))
+        recommender.redis_cache.empty!(recommender.recommendations_key(1, 10))
+        recommender.recommend(1, 10, nil).should == cached
+      end
+
+      it "should cache correct value for similar_items" do
+        cached = recommender.redis_cache.get(recommender.similar_items_key(2, 10))
+        recommender.redis_cache.empty!(recommender.similar_items_key(2, 10))
+        recommender.similar_items(2, 10, nil).should == cached
+      end
+    end
+
+    context "UserBased" do
+      let(:params) {{:similarity => "SpearmanCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :redis => {:url => 'redis://localhost:6379'}, :neighborhood_size => 3}}
+      let(:recommender) {JrubyMahout::Recommender.new(params)}
+      before do
+        recommender.data_model = data_model
+        recommender.recommend(1, 10, nil)
+        recommender.similar_users(2, 10, nil)
+      end
+
+      it "should cache the recommendations" do
+        recommender.redis_cache.get(recommender.recommendations_key(1, 10)).should_not be_nil
+      end
+
+      it "should cache the similar_items" do
+        recommender.redis_cache.get(recommender.similar_users_key(2, 10)).should_not be_nil
+      end
+
+      it "should cache correct value for recommendations" do
+        cached = recommender.redis_cache.get(recommender.recommendations_key(1, 10))
+        recommender.redis_cache.empty!(recommender.recommendations_key(1, 10))
+        recommender.recommend(1, 10, nil).should == cached
+      end
+
+      it "should cache correct value for similar_users" do
+        cached = recommender.redis_cache.get(recommender.similar_users_key(2, 10))
+        recommender.redis_cache.empty!(recommender.similar_users_key(2, 10))
+        recommender.similar_users(2, 10, nil).should == cached
       end
     end
   end
