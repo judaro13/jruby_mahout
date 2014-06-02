@@ -8,8 +8,7 @@ module JrubyMahout
       @recommender_builder = RecommenderBuilder.new(params)
       @data_model  = nil
       @recommender = nil
-      @recommender_name = params[:recommender]
-      @similarity_name  = params[:similarity]
+      @params      = params
       @redis_cache = RedisCache.new(params.hash_val(:redis, :url), params.hash_val(:redis, :prefix))
     end
 
@@ -140,7 +139,7 @@ module JrubyMahout
     end
 
     def cache_key_suffix
-      "-#{@recommender_name}-#{@similarity_name}"
+      "-#{Digest::MD5.hexdigest(@params.to_s)}"
     end
   end
 end
