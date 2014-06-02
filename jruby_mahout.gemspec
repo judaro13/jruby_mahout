@@ -15,10 +15,9 @@ Gem::Specification.new do |gem|
   gem.test_files = Dir["spec/**/*"]
   gem.executables = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
 
-  gem.add_dependency "redis", ">= 3.0.0"
+  gem.add_dependency "redis", "~> 3.0"
 
-  gem.add_development_dependency "rake"
-  gem.add_development_dependency "codeclimate-test-reporter"
+  gem.add_development_dependency "rake", "~>10.3"
   gem.add_development_dependency "ruby-debug"
   gem.add_development_dependency "rspec"
 end

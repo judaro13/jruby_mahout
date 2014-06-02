@@ -3,6 +3,7 @@ module JrubyMahout
   Dir.glob("#{ENV['MAHOUT_DIR']}/libexec/*.jar").each { |d| require d }
 
   require 'redis'
+  require 'json'
   require 'digest/md5'
   require 'jruby_mahout/helpers/hash_ext'
   require 'jruby_mahout/helpers/exception_handler'
