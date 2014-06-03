@@ -139,7 +139,7 @@ module JrubyMahout
     end
 
     def cache_key_suffix
-      "-#{Digest::MD5.hexdigest(@params.to_s)}"
+      "-#{@params.to_s}"
     end
   end
 end

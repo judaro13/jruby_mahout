@@ -36,5 +36,5 @@ PLATFORMS
 DEPENDENCIES
   jruby_mahout!
   rake (~> 10.3)
-  rspec
-  ruby-debug
+  rspec (~> 2.14)
+  ruby-debug (~> 0)

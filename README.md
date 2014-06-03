@@ -38,7 +38,8 @@ export MAHOUT_DIR=/bin/mahout
 The easiest way to start working with Jruby Mahout recommendations is to initialize a recommender:
 ```ruby
 require 'jruby_mahout'
-recommender = JrubyMahout::Recommender.new("PearsonCorrelationSimilarity", 5, "GenericUserBasedRecommender", false)
+params      = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5}
+recommender = JrubyMahout::Recommender.new(params)
 ```
 
 Set up a data model:
