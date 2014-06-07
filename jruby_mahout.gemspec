@@ -18,6 +18,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "redis", "~> 3.0"
 
   gem.add_development_dependency "rake", "~>10.3"
-  gem.add_development_dependency "ruby-debug", "~> 0"
-  gem.add_development_dependency "rspec", "~> 2.14"
+  gem.add_development_dependency "ruby-debug", "~>0"
+  gem.add_development_dependency "rspec", "~>2.14"
 end

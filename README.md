@@ -1,6 +1,7 @@
+# JRuby Mahout
+
 [![Code Climate](https://codeclimate.com/github/daifu/jruby_mahout.png)](https://codeclimate.com/github/daifu/jruby_mahout)
 
-# JRuby Mahout
 Jruby Mahout is a gem that unleashes the power of Apache Mahout in the world of JRuby. Mahout is a superior machine learning library written in Java. It deals with recommendations, clustering and classification machine learning problems at scale. Until now it was difficult to use it in Ruby projects. You'd have to implement Java interfaces in JRuby yourself, which is not quick especially if you just started exploring the world of machine learning.
 
 The goal of this library is to make machine learning at scale in JRuby projects simple.
