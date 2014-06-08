@@ -15,12 +15,15 @@ First of all you need to download the Mahout library from one of the [mirrors](h
 ## Get Postgres JDBC Adapter
 If you wish to work with a database for recommendations, you'll have to install the [JDBC driver for Postgres](http://jdbc.postgresql.org/download.html). Another option is to use file-based recommendations.
 
+## Get Mysql Connector/J
+If you want to work with Mysql database for recommendations, you need to download [Mysql Connector/J](http://dev.mysql.com/downloads/connector/j/).
+
 ## Installation
 ### 1. Set the environment variable MAHOUT_DIR to point at your Mahout installation.
 ### 2. Add the gem to your `Gemfile`
 ```ruby
 platform :jruby do
-  gem "jruby_mahout"
+  gem "jruby_mahout", :git => git@github.com:daifu/jruby_mahout.git
 end
 ```
 ### 3. Run `bundle install`.
@@ -66,6 +69,7 @@ vasinov has an article on how to utilize JRuby Mahout in the real world projects
 
 ## Development Plans
 There are several things that should be supported by this gem, before it can be used in production. Some of them are:
+- Spark integration
 - Hadoop integration
 - Clustering support
 - Classification support
