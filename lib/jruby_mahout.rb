@@ -1,6 +1,9 @@
 module JrubyMahout
   require 'java'
-  Dir.glob("#{ENV['MAHOUT_DIR']}/libexec/*.jar").each { |d| require d }
+  require File.join(ENV["MAHOUT_DIR"], 'mahout-core-0.9.jar')
+  require File.join(ENV["MAHOUT_DIR"], 'mahout-integration-0.9.jar')
+  require File.join(ENV["MAHOUT_DIR"], 'mahout-math-0.9.jar')
+  Dir.glob(File.join(ENV["MAHOUT_DIR"], 'lib/*.jar')).each { |d| require d }
 
   require 'redis'
   require 'json'
