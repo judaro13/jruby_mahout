@@ -1,6 +1,5 @@
 module JrubyMahout
   class ClassifierBuilder
-    include JrubyMahout::Helpers::ExceptionHandler
 
     java_import org.apache.mahout.classifier.sgd.L1
     java_import org.apache.mahout.classifier.sgd.OnlineLogisticRegression

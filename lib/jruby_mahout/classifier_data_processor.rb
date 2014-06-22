@@ -1,8 +1,6 @@
 module JrubyMahout
   class ClassifierDataProcessor
 
-    delegate :shuffle!, :to => :data
-
     def initialize(test_set_ratio)
       @test_set_ratio = test_set_ratio
       @data           = []
@@ -24,6 +22,10 @@ module JrubyMahout
           @data << line.strip.split(options[:delimiter], -1)
         end
       end
+    end
+
+    def shuffle!
+      @data.shuffle!
     end
 
     def get_train_set
