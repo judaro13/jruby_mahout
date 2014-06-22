@@ -15,6 +15,10 @@ module JrubyMahout
       cross_validation(options)
     end
 
+    def classify(input)
+      @classifier.classifyFull(input).each_with_index.max[1]
+    end
+
     private
 
     def cross_validation(options)
@@ -41,7 +45,7 @@ module JrubyMahout
       test_set      = @data_processor.get_test_set
       correct_count = 0
       test_set.each_with_index do |test, idx|
-        correct_count += 1 if @classifier.classifyFull(test).each_with_index.max[1] == target_set[idx]
+        correct_count += 1 if classify(test) == target_set[idx]
       end
       correct_count.to_f / [test_set.count, 1].max
     end
