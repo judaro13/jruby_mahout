@@ -491,16 +491,17 @@ describe JrubyMahout::Recommender do
     end
 
     context "UserBased" do
-      let(:params) {{:similarity => "SpearmanCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :redis => {:url => 'redis://localhost:6379'}, :neighborhood_size => 3}}
+      let(:params) {{:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :redis => {:url => 'redis://localhost:6379'}, :neighborhood_size => 3}}
       let(:recommender) {JrubyMahout::Recommender.new(params)}
       before do
         recommender.data_model = data_model
-        recommender.recommend(1, 10, nil)
+        recommendations = recommender.recommend(3, 10, nil)
+        recommendations.size.should > 0
         recommender.similar_users(2, 10, nil)
       end
 
       it "should cache the recommendations" do
-        recommender.redis_cache.get(recommender.recommendations_key(1, 10)).should_not be_nil
+        recommender.redis_cache.get(recommender.recommendations_key(3, 10)).should_not be_nil
       end
 
       it "should cache the similar_items" do
@@ -508,15 +509,31 @@ describe JrubyMahout::Recommender do
       end
 
       it "should cache correct value for recommendations" do
-        cached = recommender.redis_cache.get(recommender.recommendations_key(1, 10))
-        recommender.redis_cache.empty!(recommender.recommendations_key(1, 10))
-        recommender.recommend(1, 10, nil).should == cached
+        cached = recommender.redis_cache.get(recommender.recommendations_key(3, 10))
+        recommender.redis_cache.empty!(recommender.recommendations_key(3, 10))
+        recommender.recommend(3, 10, nil).should == cached
       end
 
       it "should cache correct value for similar_users" do
         cached = recommender.redis_cache.get(recommender.similar_users_key(2, 10))
         recommender.redis_cache.empty!(recommender.similar_users_key(2, 10))
         recommender.similar_users(2, 10, nil).should == cached
+      end
+
+      context "with expire_in option" do
+        it "should alllow expire_in option" do
+          recommendations = recommender.recommend(5, 10, nil, {:expire_in => 0})
+          recommendations.size.should > 0
+          recommender.redis_cache.get(recommender.recommendations_key(5, 10)).should be_nil
+        end
+
+        it "should be expired after expire_in" do
+          recommender.redis_cache.empty!(recommender.recommendations_key(5, 10))
+          recommender.recommend(5, 10, nil, {:expire_in => 1})
+          recommender.redis_cache.get(recommender.recommendations_key(5, 10)).should_not be_nil
+          sleep 1
+          recommender.redis_cache.get(recommender.recommendations_key(5, 10)).should be_nil
+        end
       end
     end
   end

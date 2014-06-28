@@ -21,8 +21,9 @@ module JrubyMahout
       JSON.parse val if val
     end
 
-    def set(key, value)
+    def set(key, value, option={})
       @redis.set(key, value)
+      @redis.expire(key, option[:expire_in]) if option[:expire_in]
     end
   end
 end

@@ -17,7 +17,7 @@ module JrubyMahout
       @recommender = @recommender_builder.build_recommender(@data_model)
     end
 
-    def recommend(user_id, number_of_items, rescorer)
+    def recommend(user_id, number_of_items, rescorer, option={})
       with_exception do
         cached_recommendations = @redis_cache.get(recommendations_key(user_id, number_of_items))
 
@@ -29,7 +29,7 @@ module JrubyMahout
             recommendations_array << [recommendation.getItemID, recommendation.getValue.round(5)]
           end
 
-          @redis_cache.set(recommendations_key(user_id, number_of_items), recommendations_array.to_json)
+          @redis_cache.set(recommendations_key(user_id, number_of_items), recommendations_array.to_json, option)
 
           recommendations_array
         end
@@ -43,7 +43,7 @@ module JrubyMahout
       end
     end
 
-    def similar_items(item_id, number_of_items, rescorer)
+    def similar_items(item_id, number_of_items, rescorer, option={})
       with_exception do
         cached_similar_items = @redis_cache.get(similar_items_key(item_id, number_of_items))
 
@@ -55,7 +55,7 @@ module JrubyMahout
             similarities_array << similarity.getItemID
           end
 
-          @redis_cache.set(similar_items_key(item_id, number_of_items), similarities_array.to_json)
+          @redis_cache.set(similar_items_key(item_id, number_of_items), similarities_array.to_json, option)
 
           similarities_array
         end
@@ -63,14 +63,14 @@ module JrubyMahout
       end
     end
 
-    def similar_users(user_id, number_of_users, rescorer)
+    def similar_users(user_id, number_of_users, rescorer, option={})
       with_exception do
         cached_similar_users = @redis_cache.get(similar_users_key(user_id, number_of_users))
 
         cached_similar_users ||= begin
           similar_users = to_array(@recommender.mostSimilarUserIDs(user_id, number_of_users, rescorer))
 
-          @redis_cache.set(similar_users_key(user_id, number_of_users), similar_users.to_json)
+          @redis_cache.set(similar_users_key(user_id, number_of_users), similar_users.to_json, option)
 
           similar_users
         end
@@ -78,14 +78,14 @@ module JrubyMahout
       end
     end
 
-    def estimate_preference(user_id, item_id)
+    def estimate_preference(user_id, item_id, option={})
       with_exception do
         cached_estimate_preference = @redis_cache.get(estimate_preference_key(user_id, item_id))
 
         cached_estimate_preference ||= begin
           estimate_preference = @recommender.estimatePreference(user_id, item_id)
 
-          @redis_cache.set(estimate_preference_key(user_id, item_id), estimate_preference.to_json)
+          @redis_cache.set(estimate_preference_key(user_id, item_id), estimate_preference.to_json, option)
 
           estimate_preference
         end
@@ -93,14 +93,14 @@ module JrubyMahout
       end
     end
 
-    def recommended_because(user_id, item_id, number_of_items)
+    def recommended_because(user_id, item_id, number_of_items, option={})
       with_exception do
         cached_recommended_because = @redis_cache.get(recommended_because_key(user_id, item_id, number_of_items))
 
         cached_recommended_because ||= begin
           recommended_because = to_array(@recommender.recommendedBecause(user_id, item_id, number_of_items))
 
-          @redis_cache.set(recommended_because_key(user_id, item_id, number_of_items), recommended_because.to_json)
+          @redis_cache.set(recommended_because_key(user_id, item_id, number_of_items), recommended_because.to_json, option)
 
           recommended_because
         end
