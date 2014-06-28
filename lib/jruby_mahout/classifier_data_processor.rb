@@ -1,9 +1,11 @@
 module JrubyMahout
   class ClassifierDataProcessor
 
+    java_import org.apache.mahout.math.AbstractVector
+
     def initialize(test_set_ratio)
       @test_set_ratio = test_set_ratio
-      @data           = []
+      @data           = nil
       @target_column  = nil
     end
 
@@ -19,11 +21,14 @@ module JrubyMahout
       @target_column = options[:target_column]
       skip_columns   = options[:skip_columns] || []
       skip_header    = options[:skip_header]  || true
+
+      @data = AbstractVector.new(options[:num_categories])
       File.open(file, 'r') do |infile|
         infile.gets if skip_header
         while(line = infile.gets)
           columns = line.strip.split(options[:delimiter], -1)
           remove_column!(columns, skip_columns)
+          @data.assign(Encoder.encode(columns))
         end
       end
     end

@@ -7,8 +7,8 @@ module JrubyMahout
     attr_accessor :classifier
 
     def initialize(algorithm, options)
-      @algorithm      = algorithm
-      @options        = options
+      @algorithm = algorithm
+      @options   = options
     end
 
     def build_classifier
