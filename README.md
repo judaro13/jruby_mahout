@@ -61,7 +61,7 @@ You can evaluate your recommender to see how efficient it is:
 puts recommender.evaluate(0.7, 0.3)
 ```
 
-If you want to use redis to cache the result, you can change the params as following:
+If you want to use redis to cache the result, you can change the params as following, by default the cache has no expiration:
 ```ruby
 params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5, :redis => {:url => 'redis://localhost:6379'}}
 recommender = JrubyMahout::Recommender.new(params)
@@ -69,7 +69,7 @@ recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "rec
 recommender.recommend(2, 10, nil, {:expire_in => 3600}) # expire the cache in 3600 seconds
 ```
 
-If you want to use rescorer, you can use this example:
+If you want to use rescorer, you can see this example:
 ``` ruby
 params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5, :redis => {:url => 'redis://localhost:6379'}}
 recommender = JrubyMahout::Recommender.new(params)
@@ -77,7 +77,7 @@ recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "rec
 
 is_filtered = lambda { |id| id == 12 } # item id with 12 is out of stock
 re_score    = lambda do |id, original_score|
-  # item id with 9 is so popular recently, you want to boot the score
+  # item id with 9 is so popular recently, you want to boost the score manually
   id == 9 ? original_score + 1 : original_score
 end
 rescorer = JrubyMahout::CustomRescorer.new(is_filtered, re_score)
