@@ -12,6 +12,7 @@ module JrubyMahout
   require 'jruby_mahout/helpers/exception_handler'
   require 'jruby_mahout/recommender'
   require 'jruby_mahout/recommender_builder'
+  require 'jruby_mahout/custom_rescorer'
   require 'jruby_mahout/data_model'
   require 'jruby_mahout/redis_cache'
   require 'jruby_mahout/evaluator'

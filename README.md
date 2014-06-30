@@ -29,7 +29,7 @@ end
 ### 3. Run `bundle install`.
 
 ## Brief Introduction
-This repo is [vasinov](https://github.com/vasinov/jruby_mahout) and because vasinov is not going to suport the project, then I try to matian this project during my free time.
+This is a fork of [vasinov](https://github.com/vasinov/jruby_mahout) and because vasinov havn't suported the project for a long time, then I try to matian this project during my free time.
 
 I am planning to add more examples covering Jruby Mahout use cases soon.
 
@@ -61,6 +61,29 @@ You can evaluate your recommender to see how efficient it is:
 puts recommender.evaluate(0.7, 0.3)
 ```
 
+If you want to use redis to cache the result, you can change the params as following:
+```ruby
+params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5, :redis => {:url => 'redis://localhost:6379'}}
+recommender = JrubyMahout::Recommender.new(params)
+recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "recommender_data.csv" }).data_model
+recommender.recommend(2, 10, nil, {:expire_in => 3600}) # expire the cache in 3600 seconds
+```
+
+If you want to use rescorer, you can use this example:
+``` ruby
+params = {:similarity => "PearsonCorrelationSimilarity", :recommender => "GenericUserBasedRecommender", :neighborhood_size => 5, :redis => {:url => 'redis://localhost:6379'}}
+recommender = JrubyMahout::Recommender.new(params)
+recommender.data_model = JrubyMahout::DataModel.new("file", { :file_path => "recommender_data.csv" }).data_model
+
+is_filtered = lambda { |id| id == 12 } # item id with 12 is out of stock
+re_score    = lambda do |id, original_score|
+  # item id with 9 is so popular recently, you want to boot the score
+  id == 9 ? original_score + 1 : original_score
+end
+rescorer = JrubyMahout::CustomRescorer.new(is_filtered, re_score)
+recommender.recommend(3,2,rescorer) # it will return without item with id 12 and item with id 9 will have an extra point
+```
+
 The closer the score is to zero—the better.
 
 ## Advanced
@@ -79,6 +102,14 @@ If you feel like you can help—please do.
 
 ## Testing
 Jruby Mahout is thoroughly tested with Rspec.
+
+```ruby
+rspec spec/ # run all the test.
+```
+
+## FAQ
+1. How to remove all the log message?
+Because by default, there are some loging library from mahout, if you dont want those INFO message, you can download the package from [slf4j](http://www.slf4j.org/download.html), and copy slf4j-nop-1.7.7.jar to $MAHOUT_DIR/lib/ and remove slf4j-log4j12-1.7.5.jar from $MAHOUT_DIR/lib/
 
 ## Contribute
 - Fork the project.
