@@ -8,6 +8,7 @@ module JrubyMahout
     java_import org.apache.mahout.cf.taste.impl.similarity.SpearmanCorrelationSimilarity
     java_import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity
     java_import org.apache.mahout.cf.taste.impl.similarity.TanimotoCoefficientSimilarity
+    java_import org.apache.mahout.cf.taste.impl.similarity.UncenteredCosineSimilarity
 
     java_import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
     java_import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood
