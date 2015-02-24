@@ -57,6 +57,8 @@ module JrubyMahout
           LogLikelihoodSimilarity.new(data_model)
         when "TanimotoCoefficientSimilarity"
           TanimotoCoefficientSimilarity.new(data_model)
+        when "UncenteredCosineSimilarity"
+          UncenteredCosineSimilarity.new(data_model)
         when "ALSWRFactorizer"
           ALSWRFactorizer.new(data_model, @features, @lambda, @iterations);
         else
