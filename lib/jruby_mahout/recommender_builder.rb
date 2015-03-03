@@ -15,6 +15,8 @@ module JrubyMahout
 
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
     java_import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.RandomRecommender
+    java_import org.apache.mahout.cf.taste.impl.recommender.ItemAverageRecommender
 
     java_import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender
     java_import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer
@@ -85,6 +87,10 @@ module JrubyMahout
           @item_based_allowed ? GenericItemBasedRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
         when "SVDRecommender"
           @is_svd ? SVDRecommender.new(data_model, similarity) : JrubyMahout::NilRecommender.new
+        when "RandomRecommender"
+          RandomRecommender.new(data_model)
+        when "ItemAverageRecommender"
+          ItemAverageRecommender.new(data_model)
         else
           nil
       end
